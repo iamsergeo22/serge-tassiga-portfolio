@@ -38,11 +38,11 @@ export function ContactSection() {
     
     try {
       // Initialize EmailJS with your public key
-      emailjs.init('YOUR_PUBLIC_KEY')
+      emailjs.init('7UxOgw10-8-4Desnt')
       
       await emailjs.send(
-        'YOUR_SERVICE_ID',
-        'YOUR_TEMPLATE_ID',
+        'service_ktot1wd',
+        'template_wu02uwh',
         {
           from_name: formData.name,
           from_email: formData.email,
