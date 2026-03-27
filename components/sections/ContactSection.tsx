@@ -35,28 +35,39 @@ export function ContactSection() {
     e.preventDefault()
     setIsSubmitting(true)
     setError(null)
-    
+
     try {
       // Initialize EmailJS with your public key
       emailjs.init('7UxOgw10-8-4Desnt')
-      
-      await emailjs.send(
+
+      // Make sure these variable names match your EmailJS template
+      const templateParams = {
+        name: formData.name,           // Changed from from_name to name
+        email: formData.email,         // Changed from from_email to email
+        phone: formData.phone,
+        service: formData.service,
+        message: formData.message,
+        time: new Date().toLocaleString('en-US', {
+          dateStyle: 'full',
+          timeStyle: 'short'
+        })
+      }
+
+      console.log('Sending email with params:', templateParams) // Debug log
+
+      const response = await emailjs.send(
         'service_ktot1wd',
         'template_wu02uwh',
-        {
-          from_name: formData.name,
-          from_email: formData.email,
-          phone: formData.phone,
-          service: formData.service,
-          message: formData.message,
-          to_email: 'sergetassiga22@gmail.com',
-        }
+        templateParams
       )
-      
+
+      console.log('Email sent successfully:', response) // Debug log
+
       setIsSubmitted(true)
       setFormData({ name: '', email: '', phone: '', service: '', message: '' })
       setTimeout(() => setIsSubmitted(false), 5000)
     } catch (err) {
+      console.error('EmailJS Error Details:', err) // Detailed error log
       setError('Something went wrong. Please try again or contact me directly via email.')
     } finally {
       setIsSubmitting(false)
@@ -64,35 +75,35 @@ export function ContactSection() {
   }
 
   const contactMethods = [
-    { 
-      icon: '📞', 
-      title: 'Call Me', 
-      info: '+250 785 658 174', 
-      action: 'Call Now', 
+    {
+      icon: '📞',
+      title: 'Call Me',
+      info: '+250 785 658 174',
+      action: 'Call Now',
       link: 'tel:+250785658174',
       color: 'from-indigo-500 to-indigo-600'
     },
-    { 
-      icon: '✉️', 
-      title: 'Email Me', 
-      info: 'sergetassiga22@gmail.com', 
-      action: 'Send Email', 
+    {
+      icon: '✉️',
+      title: 'Email Me',
+      info: 'sergetassiga22@gmail.com',
+      action: 'Send Email',
       link: 'mailto:sergetassiga22@gmail.com',
       color: 'from-cyan-500 to-cyan-600'
     },
-    { 
-      icon: '💬', 
-      title: 'Skype', 
-      info: 'Serge Tassiga', 
-      action: 'Chat Now', 
+    {
+      icon: '💬',
+      title: 'Skype',
+      info: 'Serge Tassiga',
+      action: 'Chat Now',
       link: 'skype:live:sergetassiga?chat',
       color: 'from-indigo-500 to-cyan-500'
     },
-    { 
-      icon: '🔗', 
-      title: 'LinkedIn', 
-      info: 'Serge Anan Tassiga', 
-      action: 'Connect', 
+    {
+      icon: '🔗',
+      title: 'LinkedIn',
+      info: 'Serge Anan Tassiga',
+      action: 'Connect',
       link: 'https://linkedin.com/in/serge-tassiga',
       color: 'from-blue-500 to-indigo-600'
     }
@@ -127,7 +138,7 @@ export function ContactSection() {
           </defs>
           <rect width="100%" height="100%" fill="url(#grid-pattern)" />
         </svg>
-        
+
         {/* Animated Gradient Blobs */}
         <motion.div
           animate={{
@@ -171,16 +182,16 @@ export function ContactSection() {
               <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
               <span className="text-sm font-medium">Get In Touch</span>
             </motion.div>
-            
+
             <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
               Let's Work
               <span className="block bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
                 Together
               </span>
             </h2>
-            
+
             <p className="text-lg text-slate-300 mb-8 leading-relaxed">
-              Have a project in mind? Looking for a backend engineer or full-stack developer? 
+              Have a project in mind? Looking for a backend engineer or full-stack developer?
               I'm always open to discussing new opportunities and innovative ideas.
             </p>
 
@@ -234,7 +245,7 @@ export function ContactSection() {
                   </div>
                 ))}
               </div>
-              
+
               {/* Quick Note */}
               <div className="mt-4 pt-4 border-t border-slate-700">
                 <div className="flex items-center gap-2 text-sm">
@@ -257,7 +268,7 @@ export function ContactSection() {
             className="bg-slate-800 rounded-3xl shadow-2xl p-8 border border-slate-700"
           >
             <h3 className="text-2xl font-bold text-white mb-6">Send a Message</h3>
-            
+
             {isSubmitted ? (
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
