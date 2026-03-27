@@ -3,7 +3,7 @@
 
 import { motion, useAnimation } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import emailjs from '@emailjs/browser'
 
 export function ContactSection() {
@@ -24,6 +24,12 @@ export function ContactSection() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Initialize EmailJS once when component mounts
+  useEffect(() => {
+    // Initialize EmailJS with your public key
+    emailjs.init('7UxOgw10-8-4Desnt')
+  }, [])
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
@@ -37,38 +43,58 @@ export function ContactSection() {
     setError(null)
 
     try {
-      // Initialize EmailJS with your public key
-      emailjs.init('7UxOgw10-8-4Desnt')
-
-      // Make sure these variable names match your EmailJS template
-      const templateParams = {
-        name: formData.name,           // Changed from from_name to name
-        email: formData.email,         // Changed from from_email to email
-        phone: formData.phone,
-        service: formData.service,
-        message: formData.message,
-        time: new Date().toLocaleString('en-US', {
-          dateStyle: 'full',
-          timeStyle: 'short'
-        })
+      // Validate form data
+      if (!formData.name || !formData.email || !formData.message) {
+        throw new Error('Please fill in all required fields')
       }
 
-      console.log('Sending email with params:', templateParams) // Debug log
+      // Template variables that match your EmailJS template
+      const templateParams = {
+        name: String(formData.name),
+        email: String(formData.email),
+        phone: String(formData.phone || 'Not provided'),
+        service: String(formData.service || 'Not specified'),
+        message: String(formData.message)
+      }
 
+      console.log('=== EMAILJS DEBUG ===')
+      console.log('Service ID:', 'service_ktot1wd')
+      console.log('Template ID:', 'template_j804y2e')
+      console.log('Public Key:', '7UxOgw10-8-4Desnt')
+      console.log('Params:', templateParams)
+      console.log('=====================')
+
+      // Send email
       const response = await emailjs.send(
         'service_ktot1wd',
-        'template_wu02uwh',
+        'template_j804y2e',
         templateParams
       )
 
-      console.log('Email sent successfully:', response) // Debug log
+      console.log('Success response:', response)
 
       setIsSubmitted(true)
       setFormData({ name: '', email: '', phone: '', service: '', message: '' })
       setTimeout(() => setIsSubmitted(false), 5000)
-    } catch (err) {
-      console.error('EmailJS Error Details:', err) // Detailed error log
-      setError('Something went wrong. Please try again or contact me directly via email.')
+    } catch (err: any) {
+      console.error('=== EMAILJS ERROR ===')
+      console.error('Error object:', err)
+      console.error('Error status:', err?.status)
+      console.error('Error text:', err?.text)
+      console.error('Error message:', err?.message)
+      console.error('=====================')
+
+      // Display more specific error message
+      let errorMessage = 'Something went wrong. '
+      if (err?.text) {
+        errorMessage += err.text
+      } else if (err?.message) {
+        errorMessage += err.message
+      } else {
+        errorMessage += 'Please try again or contact me directly via email.'
+      }
+
+      setError(errorMessage)
     } finally {
       setIsSubmitting(false)
     }
@@ -322,15 +348,14 @@ export function ContactSection() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Phone *</label>
+                    <label className="block text-sm font-medium text-slate-300 mb-2">Phone</label>
                     <input
                       type="tel"
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      required
                       className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-white placeholder-slate-500"
-                      placeholder="+250 785 658 174"
+                      placeholder="+250 785 658 174 (Optional)"
                     />
                   </div>
                 </div>
@@ -343,7 +368,7 @@ export function ContactSection() {
                     onChange={handleChange}
                     className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-white"
                   >
-                    <option value="">Select a service</option>
+                    <option value="">Select a service (Optional)</option>
                     {serviceOptions.map(service => (
                       <option key={service} value={service}>{service}</option>
                     ))}
